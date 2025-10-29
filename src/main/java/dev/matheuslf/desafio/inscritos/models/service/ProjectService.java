@@ -1,6 +1,6 @@
 package dev.matheuslf.desafio.inscritos.models.service;
 
-import dev.matheuslf.desafio.inscritos.exceptions.ProjectException;
+import dev.matheuslf.desafio.inscritos.exceptions.project.ProjectException;
 import dev.matheuslf.desafio.inscritos.models.dtos.ProjectRequestDTO;
 import dev.matheuslf.desafio.inscritos.models.dtos.ProjectResponseDTO;
 import dev.matheuslf.desafio.inscritos.models.entities.ProjectModel;

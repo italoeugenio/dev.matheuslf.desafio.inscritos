@@ -42,7 +42,6 @@ public class ProjectModel {
     private LocalDateTime endDate;
 
     @OneToMany(mappedBy = "project", fetch = FetchType.LAZY)
-    @JsonIgnore
     private List<TaskModel> tasks = new ArrayList<>();
 
     public ProjectModel(ProjectRequestDTO data){

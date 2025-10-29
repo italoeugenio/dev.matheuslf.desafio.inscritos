@@ -1,4 +1,4 @@
-package dev.matheuslf.desafio.inscritos.exceptions;
+package dev.matheuslf.desafio.inscritos.exceptions.project;
 
 import lombok.Builder;
 import lombok.Data;

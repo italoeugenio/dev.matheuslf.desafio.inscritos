@@ -1,4 +1,4 @@
-package dev.matheuslf.desafio.inscritos.exceptions;
+package dev.matheuslf.desafio.inscritos.exceptions.project;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
