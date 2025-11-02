@@ -41,7 +41,7 @@ public class ProjectModel {
     @Column(name = "end_date")
     private LocalDateTime endDate;
 
-    @OneToMany(mappedBy = "project", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "project", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TaskModel> tasks = new ArrayList<>();
 
     public ProjectModel(ProjectRequestDTO data){

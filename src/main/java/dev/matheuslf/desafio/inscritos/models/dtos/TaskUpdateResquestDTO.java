@@ -8,12 +8,11 @@ import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-public record TaskRequestDTO(
+public record TaskUpdateResquestDTO(
         @NotBlank String title,
         @NotBlank String description,
         @NotNull TaskStatus status,
         @NotNull TaskPriority priority,
-        @NotNull LocalDateTime dueDate,
-        @NotNull UUID projectId
-        ) {
+        @NotNull LocalDateTime dueDate
+) {
 }
