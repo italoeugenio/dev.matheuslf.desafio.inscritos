@@ -1,5 +1,6 @@
 package dev.matheuslf.desafio.inscritos.models.entities;
 
+import dev.matheuslf.desafio.inscritos.models.dtos.ProjectRequestDTO;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -30,12 +31,22 @@ public class ProjectModel {
     @Size(min = 3, max = 100, message = "The min length is 3 and the max is 100 to project name")
     private String name;
 
+    @Column(name = "description")
+    private String description;
+
     @Column(name = "start_date")
     private LocalDateTime startDate;
 
     @Column(name = "end_date")
     private LocalDateTime endDate;
 
-    @OneToMany(mappedBy = "project", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "project", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TaskModel> tasks = new ArrayList<>();
+
+    public ProjectModel(ProjectRequestDTO data){
+        this.name = data.name();
+        this.description = data.description();
+        this.startDate = data.startDate();
+        this.endDate = data.endDate();
+    }
 }
