@@ -7,11 +7,12 @@ import dev.matheuslf.desafio.inscritos.models.entities.ProjectModel;
 import dev.matheuslf.desafio.inscritos.models.service.ProjectService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -26,9 +27,9 @@ public class ProjectController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @GetMapping("/")
-    public List<ProjectResponseDTO> getAll(){
-        return projectService.getAll();
+    @GetMapping("")
+    public Page<ProjectResponseDTO> getAll(Pageable pageable){
+        return projectService.getAll(pageable);
     }
 
     @GetMapping("/{id}")

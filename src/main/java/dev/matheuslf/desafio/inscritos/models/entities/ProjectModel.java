@@ -1,6 +1,5 @@
 package dev.matheuslf.desafio.inscritos.models.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import dev.matheuslf.desafio.inscritos.models.dtos.ProjectRequestDTO;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;

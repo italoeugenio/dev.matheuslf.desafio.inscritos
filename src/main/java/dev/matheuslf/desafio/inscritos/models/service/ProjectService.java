@@ -9,11 +9,11 @@ import dev.matheuslf.desafio.inscritos.models.entities.ProjectModel;
 import dev.matheuslf.desafio.inscritos.models.repository.ProjectRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -30,11 +30,9 @@ public class ProjectService {
         return projectRepository.save(projectModel);
     }
 
-    public List<ProjectResponseDTO> getAll() {
-        List<ProjectResponseDTO> projects = projectRepository.findAll().stream()
-                .map(project -> new ProjectResponseDTO(project))
-                .toList();
-        return projects;
+    public Page<ProjectResponseDTO> getAll(Pageable pageable) {
+       Page<ProjectModel> projectModels = projectRepository.findAll(pageable);
+       return projectModels.map(project -> new ProjectResponseDTO(project));
     }
 
     public ProjectResponseDetailsDTO getById(UUID id) {
