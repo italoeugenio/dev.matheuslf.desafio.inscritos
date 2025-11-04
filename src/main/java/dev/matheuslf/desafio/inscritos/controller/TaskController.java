@@ -5,6 +5,7 @@ import dev.matheuslf.desafio.inscritos.enums.TaskStatus;
 import dev.matheuslf.desafio.inscritos.models.dtos.*;
 import dev.matheuslf.desafio.inscritos.models.entities.TaskModel;
 import dev.matheuslf.desafio.inscritos.models.service.TaskService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,6 +17,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("tasks")
+@Tag(name = "Tasks", description = "Endpoints to manage the tasks")
 public class TaskController {
     @Autowired
     private TaskService taskService;
