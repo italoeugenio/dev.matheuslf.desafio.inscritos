@@ -11,6 +11,6 @@ public class ProjectExceptionDetails {
     private String title;
     private int status;
     private String details;
-    private String developerMenssage;
+    private String developerMessage;
     private LocalDateTime timestamp;
 }

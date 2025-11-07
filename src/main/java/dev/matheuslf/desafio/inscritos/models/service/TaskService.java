@@ -18,6 +18,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -33,8 +34,8 @@ public class TaskService {
     public TaskModel addTask(TaskRequestDTO data) {
         ProjectModel project = projectRepository.findById(data.projectId())
                 .orElseThrow(() -> new ProjectNotFoundException("Project not found"));
-        if (data.dueDate().isAfter(project.getEndDate()))
-            throw new TaskException("The due date of the task can't be after the end date of the project");
+        if (data.dueDate().isAfter(project.getEndDate()) || data.dueDate().isBefore(project.getStartDate()))
+            throw new TaskException("The task's due date must be between the project's start and end dates");
         TaskModel task = new TaskModel(data);
         task.setProject(project);
         return taskRepository.save(task);
@@ -72,14 +73,16 @@ public class TaskService {
                 .toList();
     }
 
+    @Transactional
     public void updateTask(UUID id, TaskUpdateResquestDTO data) {
         TaskModel task = taskRepository.findById(id).orElseThrow(() -> new TaskNotFoundException("Task not found"));
-        if (data.dueDate().isAfter(task.getProject().getEndDate()))
-            throw new TaskException("The due date of the task can't be after the end date of the project");
+        if (data.dueDate().isAfter(task.getProject().getEndDate()) || data.dueDate().isBefore(task.getProject().getStartDate()))
+            throw new TaskException("The task's due date must be between the project's start and end dates");
         BeanUtils.copyProperties(data, task);
         taskRepository.save(task);
     }
 
+    @Transactional
     public void updateTaskStatus(UUID id, TaskStatusUpdateDTO data) {
         TaskModel task = taskRepository.findById(id).orElseThrow(() -> new TaskNotFoundException("Task not found"));
         BeanUtils.copyProperties(data, task);
