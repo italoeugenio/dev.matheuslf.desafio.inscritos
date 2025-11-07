@@ -26,11 +26,8 @@ public class ProjectService {
     private ProjectRepository projectRepository;
 
     public ProjectModel saveProject(ProjectRequestDTO data) {
+        validateProjectDates(data);
         ProjectModel projectModel = new ProjectModel(data);
-        if (projectModel.getEndDate().isBefore(projectModel.getStartDate()))
-            throw new ProjectException("The end date can't be before start date");
-        if (projectModel.getStartDate().isBefore(LocalDateTime.now()))
-            throw new ProjectException("The start date can't be one that has passed");
         return projectRepository.save(projectModel);
     }
 
@@ -53,19 +50,47 @@ public class ProjectService {
 
     @Transactional
     public void updateProject(UUID id, ProjectRequestDTO data) {
+        validateProjectDates(data);
+        ProjectModel project = projectRepository.findById(id).orElseThrow(() -> new ProjectNotFoundException("Project not found"));
+        if (project.getTasks().isEmpty()) {
+            BeanUtils.copyProperties(data, project);
+            projectRepository.save(project);
+            return;
+        }
+
+        LocalDateTime minDate = project.getTasks().get(0).getDueTime();
+        LocalDateTime maxDate = project.getTasks().get(0).getDueTime();
+        UUID idMinDate = project.getTasks().get(0).getId();
+        UUID idMaxDate = project.getTasks().get(0).getId();
+        for (int i = 0; i < project.getTasks().size(); i++) {
+            if (project.getTasks().get(i).getDueTime().isBefore(minDate)) {
+                minDate = project.getTasks().get(i).getDueTime();
+                idMinDate = project.getTasks().get(i).getId();
+            }
+            if (project.getTasks().get(i).getDueTime().isAfter(maxDate)) {
+                maxDate = project.getTasks().get(i).getDueTime();
+                idMaxDate = project.getTasks().get(i).getId();
+            }
+        }
+        if (data.startDate().isAfter(minDate) || data.endDate().isBefore(maxDate)) {
+            throw new ProjectException(
+                    String.format(
+                            "Cannot update project dates. Your tasks span from %s to %s. " +
+                                    "Please set start date on or before %s and end date on or after %s" +
+                                    " (Earliest task id: %s, Latest task id: %s)",
+                            minDate, maxDate,
+                            minDate, maxDate,
+                            idMinDate, idMaxDate
+                    ));
+        }
+        BeanUtils.copyProperties(data, project);
+        projectRepository.save(project);
+    }
+
+    public void validateProjectDates(ProjectRequestDTO data) {
         if (data.endDate().isBefore(data.startDate()))
             throw new ProjectException("The end date can't be before start date");
         if (data.startDate().isBefore(LocalDateTime.now()))
             throw new ProjectException("The start date can't be one that has passed");
-
-        ProjectModel project = projectRepository.findById(id).orElseThrow(() -> new ProjectNotFoundException("Project not found"));
-        for (TaskModel tasks : project.getTasks()) {
-            if (tasks.getDueTime().isAfter(data.endDate()) || tasks.getDueTime().isBefore(data.startDate())) {
-                ResponseEntity.status(HttpStatus.BAD_REQUEST).body(tasks);
-                throw new ProjectException("You are tring to change a the start and end date from a project, but this task date are not betwwen project date");
-            }
-        }
-        BeanUtils.copyProperties(data, project);
-        projectRepository.save(project);
     }
 }

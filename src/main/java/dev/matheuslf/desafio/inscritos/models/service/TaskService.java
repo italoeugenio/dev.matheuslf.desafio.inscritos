@@ -18,6 +18,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -72,6 +73,7 @@ public class TaskService {
                 .toList();
     }
 
+    @Transactional
     public void updateTask(UUID id, TaskUpdateResquestDTO data) {
         TaskModel task = taskRepository.findById(id).orElseThrow(() -> new TaskNotFoundException("Task not found"));
         if (data.dueDate().isAfter(task.getProject().getEndDate()) || data.dueDate().isBefore(task.getProject().getStartDate()))
@@ -80,6 +82,7 @@ public class TaskService {
         taskRepository.save(task);
     }
 
+    @Transactional
     public void updateTaskStatus(UUID id, TaskStatusUpdateDTO data) {
         TaskModel task = taskRepository.findById(id).orElseThrow(() -> new TaskNotFoundException("Task not found"));
         BeanUtils.copyProperties(data, task);
