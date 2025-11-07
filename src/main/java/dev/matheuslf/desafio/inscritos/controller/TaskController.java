@@ -1,5 +1,6 @@
 package dev.matheuslf.desafio.inscritos.controller;
 
+import dev.matheuslf.desafio.inscritos.config.swagger.docs.tasks.TaskApiDoc;
 import dev.matheuslf.desafio.inscritos.enums.TaskPriority;
 import dev.matheuslf.desafio.inscritos.enums.TaskStatus;
 import dev.matheuslf.desafio.inscritos.models.dtos.*;
@@ -22,28 +23,33 @@ public class TaskController {
     @Autowired
     private TaskService taskService;
 
+    @TaskApiDoc.CreateTasks
     @PostMapping("/addTask")
     public ResponseEntity saveTask(@Valid @RequestBody TaskRequestDTO data) {
         TaskModel task = taskService.addTask(data);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
+    @TaskApiDoc.GetAllTasks
     @GetMapping("/")
     public List<TaskResponseDetailsDTO> getAll() {
         return taskService.getAll();
     }
 
+    @TaskApiDoc.GetTaskById
     @GetMapping("/{id}")
     public TaskResponseDetailsDTO getById(@PathVariable("id") UUID id) {
         return taskService.getById(id);
     }
 
+    @TaskApiDoc.DeleteTask
     @DeleteMapping("/{id}")
     public ResponseEntity deleteTask(@PathVariable("id") UUID id) {
         taskService.deleteTask(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
+    @TaskApiDoc.GetTaskByParams
     @GetMapping("")
     public List<TaskResponseDetailsDTO> findTasks(
             @RequestParam(required = false) TaskStatus status,
@@ -52,11 +58,13 @@ public class TaskController {
         return taskService.findTasks(status,priority,projectId);
     }
 
+    @TaskApiDoc.UpdateTask
     @PutMapping("/{id}")
     public void updateTask(@PathVariable("id") UUID id, @RequestBody TaskUpdateResquestDTO data) {
         taskService.updateTask(id, data);
     }
 
+    @TaskApiDoc.UpdateTaskStatus
     @PutMapping("/{id}/status")
     public void updateTaskStatus(@PathVariable("id") UUID id, @RequestBody TaskStatusUpdateDTO data) {
         taskService.updateTaskStatus(id, data);

@@ -1,6 +1,6 @@
 package dev.matheuslf.desafio.inscritos.config.swagger.docs.project;
 
-public class ProjectApiDocConstants {
+public final class ProjectApiDocConstants {
     public static final String CREATE_PROJECT_SUMMARY = "Create a new project";
     public static final String CREATE_PROJECT_DESC = "Creates a new project with the provided information. The start date must be in the future and the end date must be after the start date.";
     public static final String GET_ALL_PROJECTS_SUMMARY = "Get all projects with pagination";
