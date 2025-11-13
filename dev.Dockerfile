@@ -4,7 +4,8 @@ COPY src /app/src
 COPY pom.xml /app
 
 WORKDIR /app
-RUN mvn clean install
+RUN mvn clean install -DskipTests
+# after create the docker compose remover test, to use postgre in container
 
 FROM eclipse-temurin:17
 
