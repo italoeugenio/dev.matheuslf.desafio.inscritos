@@ -1,5 +1,5 @@
 services:
-  app:
+  app-backend:
     build:
       context: .
       dockerfile: dev.Dockerfile
@@ -9,13 +9,24 @@ services:
       - app-database
     restart: always
     container_name: app-backend
+
   app-database:
     image: postgres:17-alpine
     container_name: app-database
     environment:
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: mydb
-    networks:
-      - private_network
+      POSTGRES_USER: dev
+      POSTGRES_PASSWORD: dev
+      POSTGRES_DB: SisInnovTech
 
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin-application
+    restart: always
+    ports:
+      - "4332:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@application.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    depends_on:
+      - app-database
