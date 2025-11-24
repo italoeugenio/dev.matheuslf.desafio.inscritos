@@ -22,6 +22,8 @@ services:
       POSTGRES_USER: dev
       POSTGRES_PASSWORD: dev
       POSTGRES_DB: SisInnovTech
+    volumes:
+      - data_postgresql:/var/lib/postgresql/data
 
 
   pgadmin:
@@ -35,3 +37,6 @@ services:
       PGADMIN_DEFAULT_PASSWORD: admin
     depends_on:
       - app-database
+
+volumes:
+  data_postgresql:
