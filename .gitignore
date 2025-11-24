@@ -33,5 +33,7 @@ build/
 .vscode/
 
 ### ENV ###
-
 *.env
+
+### MACOS ###
+.DS_Store
