@@ -20,7 +20,7 @@ public class ProjectExceptionHandler {
                         .status(HttpStatus.BAD_REQUEST.value())
                         .title("Bad Request Exception, check the documentation")
                         .details(exception.getMessage())
-                        .developerMenssage(exception.getClass().getName())
+                        .developerMessage(exception.getClass().getName())
                         .build(), HttpStatus.BAD_REQUEST
         );
     }
@@ -33,7 +33,7 @@ public class ProjectExceptionHandler {
                         .status(HttpStatus.NOT_FOUND.value())
                         .title("There is no project with this ID")
                         .details(exception.getMessage())
-                        .developerMenssage(exception.getClass().getName())
+                        .developerMessage(exception.getClass().getName())
                         .build(), HttpStatus.NOT_FOUND
         );
     }
