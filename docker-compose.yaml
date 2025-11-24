@@ -19,11 +19,13 @@ services:
     image: postgres:17-alpine
     container_name: app-database
     environment:
-      POSTGRES_USER: dev
-      POSTGRES_PASSWORD: dev
-      POSTGRES_DB: SisInnovTech
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
     volumes:
       - data_postgresql:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
 
 
   pgadmin:
