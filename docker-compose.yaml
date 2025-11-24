@@ -1,14 +1,19 @@
 services:
   app-backend:
+    container_name: app-backend
+    env_file:
+      - .env
     build:
       context: .
       dockerfile: dev.Dockerfile
     ports:
-      - "8080:8080"
+      - "${PORT}:${PORT}"
+    environment:
+      - SPRING_PROFILES_ACTIVE=container
     depends_on:
       - app-database
     restart: always
-    container_name: app-backend
+
 
   app-database:
     image: postgres:17-alpine
