@@ -1,20 +1,26 @@
 package dev.matheuslf.desafio.inscritos.models.entities;
 
+import dev.matheuslf.desafio.inscritos.enums.UserRole;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
-@Entity
+@Entity(name = "users")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = "id")
 @Table(name = "TB_USERS")
-public class UserModel {
+public class UserModel implements UserDetails {
     private static final long serialVersion = 1L;
 
     @Id
@@ -31,4 +37,53 @@ public class UserModel {
     @Column(name = "password_hash", nullable = false)
     private String password;
 
+    @Column(name = "role")
+    private UserRole role;
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        if (this.role == UserRole.ADMIN) {
+            return List.of(
+                    new SimpleGrantedAuthority("ROLE_ADMIN"),
+                    new SimpleGrantedAuthority("ROLE_PM"),
+                    new SimpleGrantedAuthority("ROLE_DEV"),
+                    new SimpleGrantedAuthority("ROLE_VIEWER"));
+        } else if (this.role == UserRole.PM) {
+            return List.of(
+                    new SimpleGrantedAuthority("ROLE_PM"),
+                    new SimpleGrantedAuthority("ROLE_DEV"),
+                    new SimpleGrantedAuthority("ROLE_VIEWER"));
+        } else if (this.role == UserRole.DEV) {
+            return List.of(
+                    new SimpleGrantedAuthority("ROLE_DEV"),
+                    new SimpleGrantedAuthority("ROLE_VIEWER"));
+        } else {
+            return List.of(new SimpleGrantedAuthority("ROLE_VIEWER"));
+        }
+    }
+
+    @Override
+    public String getUsername() {
+        return "";
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return UserDetails.super.isAccountNonExpired();
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return UserDetails.super.isAccountNonLocked();
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return UserDetails.super.isCredentialsNonExpired();
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return UserDetails.super.isEnabled();
+    }
 }
