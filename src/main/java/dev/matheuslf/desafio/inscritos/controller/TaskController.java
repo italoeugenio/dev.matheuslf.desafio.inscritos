@@ -25,26 +25,28 @@ public class TaskController {
 
     @TaskApiDoc.CreateTasks
     @PostMapping("/addTask")
-    public ResponseEntity saveTask(@Valid @RequestBody TaskRequestDTO data) {
+    public ResponseEntity<Void> saveTask(@Valid @RequestBody TaskRequestDTO data) {
         TaskModel task = taskService.addTask(data);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @TaskApiDoc.GetAllTasks
     @GetMapping("/")
-    public List<TaskResponseDetailsDTO> getAll() {
-        return taskService.getAll();
+    public ResponseEntity<List<TaskResponseDetailsDTO>> getAll() {
+        var tasks = taskService.getAll();
+        return ResponseEntity.ok().body(tasks);
     }
 
     @TaskApiDoc.GetTaskById
     @GetMapping("/{id}")
-    public TaskResponseDetailsDTO getById(@PathVariable("id") UUID id) {
-        return taskService.getById(id);
+    public ResponseEntity<TaskResponseDetailsDTO> getById(@PathVariable("id") UUID id) {
+        var task = taskService.getById(id);
+        return ResponseEntity.ok().body(task);
     }
 
     @TaskApiDoc.DeleteTask
     @DeleteMapping("/{id}")
-    public ResponseEntity deleteTask(@PathVariable("id") UUID id) {
+    public ResponseEntity<Void> deleteTask(@PathVariable("id") UUID id) {
         taskService.deleteTask(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
@@ -60,14 +62,16 @@ public class TaskController {
 
     @TaskApiDoc.UpdateTask
     @PutMapping("/{id}")
-    public void updateTask(@PathVariable("id") UUID id, @RequestBody TaskUpdateResquestDTO data) {
+    public ResponseEntity<Void> updateTask(@PathVariable("id") UUID id, @RequestBody TaskUpdateResquestDTO data) {
         taskService.updateTask(id, data);
+        return ResponseEntity.ok().build();
     }
 
     @TaskApiDoc.UpdateTaskStatus
     @PutMapping("/{id}/status")
-    public void updateTaskStatus(@PathVariable("id") UUID id, @RequestBody TaskStatusUpdateDTO data) {
+    public ResponseEntity<Void> updateTaskStatus(@PathVariable("id") UUID id, @RequestBody TaskStatusUpdateDTO data) {
         taskService.updateTaskStatus(id, data);
+        return ResponseEntity.ok().build();
     }
 
 }
