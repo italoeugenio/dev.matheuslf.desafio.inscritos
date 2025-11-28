@@ -2,15 +2,11 @@ package dev.matheuslf.desafio.inscritos.controller;
 
 import dev.matheuslf.desafio.inscritos.models.dtos.AuthenticationRequestDTO;
 import dev.matheuslf.desafio.inscritos.models.dtos.RegisterDTO;
-import dev.matheuslf.desafio.inscritos.models.entities.UserModel;
-import dev.matheuslf.desafio.inscritos.models.repository.UserRepository;
 import dev.matheuslf.desafio.inscritos.models.service.AuthenticationService;
 import jakarta.validation.Valid;
+import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -32,7 +28,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<Void> register(@RequestBody @Valid RegisterDTO data) throws AuthenticationException {
+    public ResponseEntity<Void> register(@RequestBody @Valid RegisterDTO data) throws AuthenticationException, BadRequestException {
         return authenticationService.register(data);
     }
 }

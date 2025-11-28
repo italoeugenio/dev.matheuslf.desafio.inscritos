@@ -9,5 +9,4 @@ import java.util.UUID;
 
 public interface TaskRepository extends JpaRepository<TaskModel, UUID> {
     List<TaskModel> findAll(Specification<TaskModel> spec);
-
 }

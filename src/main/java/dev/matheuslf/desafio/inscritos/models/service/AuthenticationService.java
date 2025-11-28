@@ -1,11 +1,14 @@
 package dev.matheuslf.desafio.inscritos.models.service;
 
-import dev.matheuslf.desafio.inscritos.exceptions.Authentication.AuthenticationExceptionRegister;
+import dev.matheuslf.desafio.inscritos.exceptions.Authentication.AuthenticationException;
+import dev.matheuslf.desafio.inscritos.exceptions.Authentication.InvalidEmailException;
 import dev.matheuslf.desafio.inscritos.models.dtos.AuthenticationRequestDTO;
 import dev.matheuslf.desafio.inscritos.models.dtos.RegisterDTO;
 import dev.matheuslf.desafio.inscritos.models.entities.UserModel;
 import dev.matheuslf.desafio.inscritos.models.repository.UserRepository;
+import dev.matheuslf.desafio.inscritos.utils.EmailValidator;
 import jakarta.validation.Valid;
+import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -29,9 +32,13 @@ public class AuthenticationService {
         return ResponseEntity.ok().build();
     }
 
-    public ResponseEntity<Void> register(RegisterDTO data)  {
+    public ResponseEntity<Void> register(RegisterDTO data) throws BadRequestException {
+        if(!EmailValidator.isValidEmail(data.email())){
+            throw new InvalidEmailException("Invalid e-mail. You need enter a valid e-mail");
+        }
+
         if(userRepository.findByEmail(data.email()) != null){
-            throw new AuthenticationExceptionRegister("Could not complete registration. If you already have an account, please sing in");
+            throw new AuthenticationException("Could not complete registration. If you already have an account, please sing in");
         }
         String encryptedPassword = new BCryptPasswordEncoder().encode(data.password());
         UserModel newUser = new UserModel(data.fullName(), data.email(), encryptedPassword, data.role());

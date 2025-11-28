@@ -10,6 +10,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
@@ -37,8 +38,15 @@ public class UserModel implements UserDetails {
     @Column(name = "password_hash", nullable = false)
     private String password;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "role")
     private UserRole role;
+
+    @Column(name = "create_at")
+    private LocalDateTime createAt = LocalDateTime.now();
+
+    @Column(name = "update_at")
+    private LocalDateTime updateAt;
 
     public UserModel(String fullName, String email, String password, UserRole role) {
         this.fullName = fullName;

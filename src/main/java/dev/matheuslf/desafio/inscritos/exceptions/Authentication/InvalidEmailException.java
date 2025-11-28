@@ -4,10 +4,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(HttpStatus.BAD_REQUEST)
-public class AuthenticationExceptionRegister extends RuntimeException {
-    private String message;
-
-    public AuthenticationExceptionRegister(String message){
+public class InvalidEmailException extends AuthenticationException {
+    public InvalidEmailException(String message){
         super(message);
     }
 }
