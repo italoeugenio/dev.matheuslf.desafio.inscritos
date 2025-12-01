@@ -1,9 +1,12 @@
 package dev.matheuslf.desafio.inscritos.models.service;
 
+import dev.matheuslf.desafio.inscritos.enums.UserRole;
 import dev.matheuslf.desafio.inscritos.exceptions.Authentication.AuthenticationException;
 import dev.matheuslf.desafio.inscritos.exceptions.Authentication.InvalidEmailException;
+import dev.matheuslf.desafio.inscritos.infra.security.TokenService;
 import dev.matheuslf.desafio.inscritos.models.dtos.AuthenticationRequestDTO;
-import dev.matheuslf.desafio.inscritos.models.dtos.RegisterDTO;
+import dev.matheuslf.desafio.inscritos.models.dtos.LoginResponseDTO;
+import dev.matheuslf.desafio.inscritos.models.dtos.RegisterUserDTO;
 import dev.matheuslf.desafio.inscritos.models.entities.UserModel;
 import dev.matheuslf.desafio.inscritos.models.repository.UserRepository;
 import dev.matheuslf.desafio.inscritos.utils.EmailValidator;
@@ -18,7 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
 @Service
-public class AuthenticationService {
+public class UserAuthenticationService {
 
     @Autowired
     private UserRepository userRepository;
@@ -26,22 +29,26 @@ public class AuthenticationService {
     @Autowired
     private AuthenticationManager authenticationManager;
 
-    public ResponseEntity<Void> login(@Valid @RequestBody AuthenticationRequestDTO data){
-        var usernamePassword = new UsernamePasswordAuthenticationToken(data.email(), data.password());
+    @Autowired
+    private TokenService tokenService;
+
+    public ResponseEntity login(@Valid @RequestBody AuthenticationRequestDTO data){
+        var usernamePassword = new UsernamePasswordAuthenticationToken(data.email().toLowerCase(), data.password());
         var auth = authenticationManager.authenticate(usernamePassword);
-        return ResponseEntity.ok().build();
+        var token = tokenService.generateToken((UserModel) auth.getPrincipal());
+        return ResponseEntity.ok(new LoginResponseDTO(token));
     }
 
-    public ResponseEntity<Void> register(RegisterDTO data) throws BadRequestException {
-        if(!EmailValidator.isValidEmail(data.email())){
+    public ResponseEntity<Void> register(RegisterUserDTO data) throws BadRequestException {
+        if(!EmailValidator.isValidEmail(data.email().toLowerCase())){
             throw new InvalidEmailException("Invalid e-mail. You need enter a valid e-mail");
         }
 
-        if(userRepository.findByEmail(data.email()) != null){
+        if(userRepository.findByEmail(data.email().toLowerCase()) != null){
             throw new AuthenticationException("Could not complete registration. If you already have an account, please sing in");
         }
         String encryptedPassword = new BCryptPasswordEncoder().encode(data.password());
-        UserModel newUser = new UserModel(data.fullName(), data.email(), encryptedPassword, data.role());
+        UserModel newUser = new UserModel(data.fullName(), data.email().toLowerCase(), encryptedPassword, UserRole.VIEWER);
         userRepository.save(newUser);
         return ResponseEntity.ok().build();
     }
