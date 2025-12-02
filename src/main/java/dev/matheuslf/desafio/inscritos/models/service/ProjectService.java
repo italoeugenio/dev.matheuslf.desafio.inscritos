@@ -57,16 +57,20 @@ public class ProjectService {
             return;
         }
 
-        TaskModel minTaskByDueTime = project.getTasks().stream()
-                .min(Comparator.comparing(task -> task.getDueTime()))
-                .orElse(null);
+        TaskModel minTaskByDueTime = null;
+        TaskModel maxTaskByDueTime = null;
 
-        TaskModel maxTaskByDueTime = project.getTasks().stream()
-                .max(Comparator.comparing(task -> task.getDueTime()))
-                .orElse(null);
+        for (TaskModel task : project.getTasks()) {
+            if (minTaskByDueTime == null || task.getDueTime().isBefore(minTaskByDueTime.getDueTime())) {
+                minTaskByDueTime = task;
+            }
+            if (maxTaskByDueTime == null || task.getDueTime().isAfter(maxTaskByDueTime.getDueTime())) {
+                maxTaskByDueTime = task;
+            }
+        }
 
-
-        if (data.startDate().isAfter(minTaskByDueTime.getDueTime()) || data.endDate().isBefore(maxTaskByDueTime.getDueTime())) {
+        if (data.startDate().isAfter(minTaskByDueTime.getDueTime()) ||
+                data.endDate().isBefore(maxTaskByDueTime.getDueTime())) {
             throw new ProjectException(
                     String.format(
                             "Cannot update project dates. Your tasks span from %s to %s. " +
