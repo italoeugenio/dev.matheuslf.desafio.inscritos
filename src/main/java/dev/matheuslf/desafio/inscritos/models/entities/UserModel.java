@@ -57,11 +57,13 @@ public class UserModel implements UserDetails {
     @Column(name = "update_at")
     private LocalDateTime updateAt;
 
-    public UserModel(String fullName, String email, String password, UserRole role) {
+    public UserModel(String fullName, String email, String password, UserRole role, String verificationToken, LocalDateTime verificationCodeExpiresAt) {
         this.fullName = fullName;
         this.email = email;
         this.password = password;
         this.role = role;
+        this.verificationToken = verificationToken;
+        this.verificationCodeExpiresAt = verificationCodeExpiresAt;
     }
 
     @Override

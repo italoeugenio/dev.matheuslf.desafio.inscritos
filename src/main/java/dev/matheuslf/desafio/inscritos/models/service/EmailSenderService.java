@@ -1,5 +1,6 @@
 package dev.matheuslf.desafio.inscritos.models.service;
 
+import dev.matheuslf.desafio.inscritos.models.dtos.EmailRegisterDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -11,15 +12,13 @@ public class EmailSenderService {
     @Autowired
     private JavaMailSender mailSender;
 
-    public void sendEmail(String toEmail, String subject, String body){
+    public void sendEmailVerificationCode(EmailRegisterDTO registerDTO){
         SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom("italosantana539@gmail.com");
-        message.setTo(toEmail);
-        message.setText(body);
-        message.setSubject(subject);
+        message.setFrom("noreply@gmail.com");
+        message.setTo(registerDTO.to());
+        message.setText(registerDTO.body());
+        message.setSubject(registerDTO.subject());
 
         mailSender.send(message);
-
-        System.out.println("Email enviado com sucesso");
     }
 }

@@ -27,7 +27,7 @@ public class AdminAuthenticationController {
     }
 
     @PostMapping("/user/create")
-    public ResponseEntity<Void> register(@RequestBody @Valid RegisterAdminDTO data) throws AuthenticationException, BadRequestException {
+    public ResponseEntity<String> register(@RequestBody @Valid RegisterAdminDTO data) throws AuthenticationException, BadRequestException {
         return authenticationService.register(data);
     }
 }
