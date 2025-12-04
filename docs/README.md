@@ -1,5 +1,3 @@
-# MedAllert
-
 ## **How to Run the Project**
 
 ### **Requirements**
