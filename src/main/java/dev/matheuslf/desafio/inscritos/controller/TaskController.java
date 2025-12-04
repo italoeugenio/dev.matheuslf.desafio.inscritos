@@ -62,14 +62,14 @@ public class TaskController {
 
     @TaskApiDoc.UpdateTask
     @PutMapping("/{id}")
-    public ResponseEntity<Void> updateTask(@PathVariable("id") UUID id, @RequestBody TaskUpdateResquestDTO data) {
+    public ResponseEntity<Void> updateTask(@PathVariable("id") UUID id, @Valid @RequestBody TaskUpdateResquestDTO data) {
         taskService.updateTask(id, data);
         return ResponseEntity.ok().build();
     }
 
     @TaskApiDoc.UpdateTaskStatus
     @PutMapping("/{id}/status")
-    public ResponseEntity<Void> updateTaskStatus(@PathVariable("id") UUID id, @RequestBody TaskStatusUpdateDTO data) {
+    public ResponseEntity<Void> updateTaskStatus(@PathVariable("id") UUID id,@Valid @RequestBody TaskStatusUpdateDTO data) {
         taskService.updateTaskStatus(id, data);
         return ResponseEntity.ok().build();
     }

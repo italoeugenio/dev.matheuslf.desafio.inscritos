@@ -63,7 +63,7 @@ public class ProjectController {
 
     @ProjectApiDoc.UpdateProject
     @PutMapping("/{id}")
-    public ResponseEntity<Void> updateProject(@PathVariable("id") UUID id, @RequestBody ProjectRequestDTO data) {
+    public ResponseEntity<Void> updateProject(@PathVariable("id") UUID id,@Valid @RequestBody ProjectRequestDTO data) {
         projectService.updateProject(id, data);
         return ResponseEntity.status(HttpStatus.OK).build();
     }

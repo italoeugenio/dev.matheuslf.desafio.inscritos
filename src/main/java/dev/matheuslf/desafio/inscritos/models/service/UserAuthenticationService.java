@@ -1,17 +1,14 @@
 package dev.matheuslf.desafio.inscritos.models.service;
 
+import dev.matheuslf.desafio.inscritos.enums.CodeType;
 import dev.matheuslf.desafio.inscritos.enums.UserRole;
 import dev.matheuslf.desafio.inscritos.exceptions.Authentication.AuthenticationException;
-import dev.matheuslf.desafio.inscritos.exceptions.Authentication.InvalidEmailException;
 import dev.matheuslf.desafio.inscritos.infra.security.TokenService;
-import dev.matheuslf.desafio.inscritos.models.dtos.AuthenticationRequestDTO;
-import dev.matheuslf.desafio.inscritos.models.dtos.EmailRegisterDTO;
-import dev.matheuslf.desafio.inscritos.models.dtos.LoginResponseDTO;
-import dev.matheuslf.desafio.inscritos.models.dtos.RegisterUserDTO;
+import dev.matheuslf.desafio.inscritos.models.dtos.*;
 import dev.matheuslf.desafio.inscritos.models.entities.UserModel;
+import dev.matheuslf.desafio.inscritos.models.entities.ValidationCodesModel;
 import dev.matheuslf.desafio.inscritos.models.repository.UserRepository;
-import dev.matheuslf.desafio.inscritos.utils.EmailValidator;
-import dev.matheuslf.desafio.inscritos.utils.VerificationCode;
+// import dev.matheuslf.desafio.inscritos.utils.EmailValidator; // <--- REMOVIDO
 import jakarta.validation.Valid;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,9 +18,13 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
+import java.util.Optional;
+import java.util.Random;
 
 @Service
 public class UserAuthenticationService {
@@ -40,7 +41,11 @@ public class UserAuthenticationService {
     @Autowired
     private EmailSenderService emailSenderService;
 
-    public ResponseEntity login(@Valid @RequestBody AuthenticationRequestDTO data){
+    private String generateRandomCode() {
+        return String.valueOf(100000 + new Random().nextInt(900000));
+    }
+
+    public ResponseEntity login(@Valid @RequestBody AuthenticationRequestDTO data) {
         var usernamePassword = new UsernamePasswordAuthenticationToken(data.email().toLowerCase(), data.password());
         var auth = authenticationManager.authenticate(usernamePassword);
         var token = tokenService.generateToken((UserModel) auth.getPrincipal());
@@ -48,73 +53,98 @@ public class UserAuthenticationService {
     }
 
     public ResponseEntity<String> register(RegisterUserDTO data) throws BadRequestException {
-        if(!EmailValidator.isValidEmail(data.email().toLowerCase())){
-            throw new InvalidEmailException("Invalid e-mail. You need enter a valid e-mail");
+        if (userRepository.findByEmail(data.email().toLowerCase()) != null) {
+            throw new AuthenticationException("Could not complete registration. If you already have an account, please sign in");
         }
 
-        if(userRepository.findByEmail(data.email().toLowerCase()) != null){
-            throw new AuthenticationException("Could not complete registration. If you already have an account, please sing in");
-        }
-        
         String encryptedPassword = new BCryptPasswordEncoder().encode(data.password());
-        String verificationToken =  VerificationCode.generateVerificationCode();
-        LocalDateTime verificationCodeExpiresAt = VerificationCode.codeExpiresAt(10);
-        UserModel newUser = new UserModel(data.fullName(), data.email().toLowerCase(), encryptedPassword, UserRole.VIEWER, verificationToken,verificationCodeExpiresAt);
+
+        UserModel newUser = new UserModel();
+        newUser.setFullName(data.fullName());
+        newUser.setEmail(data.email().toLowerCase());
+        newUser.setPassword(encryptedPassword);
+        newUser.setRole(UserRole.VIEWER);
+
+        String codeValue = generateRandomCode();
+        ValidationCodesModel validationCode = new ValidationCodesModel();
+        validationCode.setCode(codeValue);
+        validationCode.setCodeType(CodeType.EMAIL_VERIFICATION);
+        validationCode.setExpiresAt(LocalDateTime.now().plusMinutes(10));
+        validationCode.setUser(newUser);
+
+        newUser.getValidationCodes().add(validationCode);
 
         EmailRegisterDTO email = new EmailRegisterDTO(
                 newUser.getEmail(),
                 "Verification Code",
-                "Your code is: " + verificationToken
-                        + "\nIt expires in 10 minutes."
+                "Your code is: " + codeValue + "\nIt expires in 10 minutes."
         );
 
         emailSenderService.sendEmailVerificationCode(email);
         userRepository.save(newUser);
+
         return ResponseEntity.status(HttpStatus.OK).body("message: Registration successful. Please check your email for verification code.\n" +
                 "email: " + newUser.getEmail()
         );
     }
 
-
-    public ResponseEntity<String> confirm(String userEmail, String code){
-        UserModel user = userRepository.findUserModelByEmail(userEmail.toLowerCase());
+    public ResponseEntity<String> confirm(ConfirmEmailRequestDTO data) {
+        UserModel user = userRepository.findUserModelByEmail(data.email().toLowerCase());
 
         if (user == null) throw new AuthenticationException("User not found");
         if (user.isVerified()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("User already verified");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User already verified");
         }
-        if (user.getVerificationToken() == null) throw new AuthenticationException("No verification code found");
-        if (user.getVerificationCodeExpiresAt().isBefore(LocalDateTime.now())) throw new AuthenticationException("Verification code has expired");
-        if (!user.getVerificationToken().equals(code)) throw new AuthenticationException("Invalid verification code");
+
+        Optional<ValidationCodesModel> validCodeOpt = user.getValidationCodes().stream()
+                .filter(code -> code.getCode().equals(data.code()))
+                .filter(code -> code.getCodeType() == CodeType.EMAIL_VERIFICATION)
+                .filter(code -> code.getConfirmedAt() == null)
+                .filter(code -> code.getExpiresAt().isAfter(LocalDateTime.now()))
+                .findFirst();
+
+        if (validCodeOpt.isEmpty()) {
+            throw new AuthenticationException("Invalid or expired verification code");
+        }
+
+        ValidationCodesModel validCode = validCodeOpt.get();
+        validCode.setConfirmedAt(LocalDateTime.now());
 
         user.setVerified(true);
-        user.setVerificationToken(null);
-        user.setVerificationCodeExpiresAt(null);
         user.setUpdateAt(LocalDateTime.now());
+
         userRepository.save(user);
         return ResponseEntity.ok("Email verified successfully");
     }
 
-    public ResponseEntity<String> resendCode(String email) {
-        UserModel user = userRepository.findUserModelByEmail(email.toLowerCase());
+    public ResponseEntity<String> resendCode(ResendCodeRequestDTO data) {
+        UserModel user = userRepository.findUserModelByEmail(data.email().toLowerCase());
         if (user == null) throw new AuthenticationException("User not found");
         if (user.isVerified()) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User already verified");
 
         LocalDateTime now = LocalDateTime.now();
-
         int timeToNewCode = 5;
-        if (user.getVerificationCodeExpiresAt() != null &&
-                now.isBefore(user.getVerificationCodeExpiresAt().minusMinutes(timeToNewCode))) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("You can request a new code only after " + timeToNewCode +" minutes from the last one");
+
+        Optional<ValidationCodesModel> lastCode = user.getValidationCodes().stream()
+                .filter(c -> c.getCodeType() == CodeType.EMAIL_VERIFICATION)
+                .max(Comparator.comparing(codes -> codes.getExpiresAt()));
+
+        if (lastCode.isPresent()) {
+            LocalDateTime createdApprox = lastCode.get().getExpiresAt().minusMinutes(10);
+            if (now.isBefore(createdApprox.plusMinutes(timeToNewCode))) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body("You can request a new code only after " + timeToNewCode + " minutes from the last one");
+            }
         }
 
-        String newVerificationCode = VerificationCode.generateVerificationCode();
-        LocalDateTime newExpiration = VerificationCode.codeExpiresAt(10);
+        String newVerificationCode = generateRandomCode();
+        ValidationCodesModel newCode = new ValidationCodesModel();
+        newCode.setCode(newVerificationCode);
+        newCode.setCodeType(CodeType.EMAIL_VERIFICATION);
+        newCode.setExpiresAt(now.plusMinutes(10));
+        newCode.setUser(user);
 
-        user.setVerificationToken(newVerificationCode);
-        user.setVerificationCodeExpiresAt(newExpiration);
+        user.getValidationCodes().add(newCode);
         user.setUpdateAt(now);
         userRepository.save(user);
 
@@ -126,15 +156,6 @@ public class UserAuthenticationService {
         );
         emailSenderService.sendEmailVerificationCode(emailDTO);
 
-        return ResponseEntity.ok("New verification code sent successfully. It expires at " + newExpiration);
+        return ResponseEntity.ok("New verification code sent successfully.");
     }
-
-    public ResponseEntity recoverPassword(String email){
-        return null;
-    }
-
-    public ResponseEntity changePassword(){
-        return null;
-    }
-
 }

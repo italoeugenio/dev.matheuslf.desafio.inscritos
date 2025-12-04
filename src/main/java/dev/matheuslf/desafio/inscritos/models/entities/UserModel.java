@@ -11,6 +11,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
@@ -45,25 +46,21 @@ public class UserModel implements UserDetails {
     @Column(name = "is_verified")
     private boolean isVerified = false;
 
-    @Column(name = "verification_token")
-    private String verificationToken;
-
-    @Column(name = "verification_code_expires_at")
-    private LocalDateTime verificationCodeExpiresAt;
-
     @Column(name = "create_at")
     private LocalDateTime createAt = LocalDateTime.now();
 
     @Column(name = "update_at")
-    private LocalDateTime updateAt;
+    private LocalDateTime updateAt = LocalDateTime.now();
+
+    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<ValidationCodesModel> validationCodes = new ArrayList<>();
+
 
     public UserModel(String fullName, String email, String password, UserRole role, String verificationToken, LocalDateTime verificationCodeExpiresAt) {
         this.fullName = fullName;
         this.email = email;
         this.password = password;
         this.role = role;
-        this.verificationToken = verificationToken;
-        this.verificationCodeExpiresAt = verificationCodeExpiresAt;
     }
 
     @Override

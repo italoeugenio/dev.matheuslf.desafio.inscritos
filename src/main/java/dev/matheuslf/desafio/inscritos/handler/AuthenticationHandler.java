@@ -1,7 +1,7 @@
 package dev.matheuslf.desafio.inscritos.handler;
 
-import dev.matheuslf.desafio.inscritos.exceptions.Authentication.AuthenticationExceptionDetails;
 import dev.matheuslf.desafio.inscritos.exceptions.Authentication.AuthenticationException;
+import dev.matheuslf.desafio.inscritos.exceptions.Authentication.AuthenticationExceptionDetails;
 import dev.matheuslf.desafio.inscritos.exceptions.Authentication.InvalidEmailException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
