@@ -8,7 +8,6 @@ import dev.matheuslf.desafio.inscritos.models.dtos.*;
 import dev.matheuslf.desafio.inscritos.models.entities.UserModel;
 import dev.matheuslf.desafio.inscritos.models.entities.ValidationCodesModel;
 import dev.matheuslf.desafio.inscritos.models.repository.UserRepository;
-// import dev.matheuslf.desafio.inscritos.utils.EmailValidator; // <--- REMOVIDO
 import jakarta.validation.Valid;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
