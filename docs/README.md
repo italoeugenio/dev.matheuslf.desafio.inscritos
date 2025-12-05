@@ -65,8 +65,3 @@ docker compose down
 - **Swagger UI:** [http://localhost:8080/swagger](http://localhost:8080/swagger)  
   The Swagger UI provides an interactive interface to explore and test the API endpoints.
 
-  **Credentials for Swagger UI:**
-  - **Username:** `dev`
-  - **Password:** `dev`
-
-
