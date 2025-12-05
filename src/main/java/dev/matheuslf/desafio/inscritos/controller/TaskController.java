@@ -69,7 +69,7 @@ public class TaskController {
 
     @TaskApiDoc.UpdateTaskStatus
     @PutMapping("/{id}/status")
-    public ResponseEntity<Void> updateTaskStatus(@PathVariable("id") UUID id,@Valid @RequestBody TaskStatusUpdateDTO data) {
+    public ResponseEntity<Void> updateTaskStatus(@PathVariable("id") UUID id,@Valid @RequestBody TaskStatusUpdateRequestDTO data) {
         taskService.updateTaskStatus(id, data);
         return ResponseEntity.ok().build();
     }

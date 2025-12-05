@@ -4,7 +4,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
-public record EmailRegisterDTO(
+public record EmailMessageDTO(
         @NotBlank(message = "Recipient email is required")
         @Email(message = "Recipient email must be valid")
         String to,

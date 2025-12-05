@@ -17,7 +17,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.time.LocalDateTime;
@@ -73,7 +72,7 @@ public class UserAuthenticationService {
 
         newUser.getValidationCodes().add(validationCode);
 
-        EmailRegisterDTO email = new EmailRegisterDTO(
+        EmailMessageDTO email = new EmailMessageDTO(
                 newUser.getEmail(),
                 "Verification Code",
                 "Your code is: " + codeValue + "\nIt expires in 10 minutes."
@@ -147,7 +146,7 @@ public class UserAuthenticationService {
         user.setUpdateAt(now);
         userRepository.save(user);
 
-        EmailRegisterDTO emailDTO = new EmailRegisterDTO(
+        EmailMessageDTO emailDTO = new EmailMessageDTO(
                 user.getEmail(),
                 "New Verification Code",
                 "Your new verification code is: " + newVerificationCode +
