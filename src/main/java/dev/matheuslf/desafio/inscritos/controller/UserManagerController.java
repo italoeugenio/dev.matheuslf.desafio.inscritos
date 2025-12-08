@@ -12,13 +12,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("mananger-users")
+@RequestMapping("manager-users")
 public class UserManagerController {
 
     @Autowired
     private UserManagerService userManagerService;
 
-    @GetMapping
+    @GetMapping("")
     public ResponseEntity<Page<UserResponseDTO>> getAllUsers(Pageable pageable) {
         Page<UserResponseDTO> users = userManagerService.getAll(pageable);
         return ResponseEntity.ok(users);
@@ -30,14 +30,14 @@ public class UserManagerController {
         return ResponseEntity.ok(user);
     }
 
-    @PatchMapping("/role/{email}/")
-    public ResponseEntity<Void> updateUserRole(@PathVariable("email") String email, @RequestBody @Valid UserUpdateRoleRequestDTO data) {
-        userManagerService.updateUserRole(data, email);
+    @PutMapping("/update-role")
+    public ResponseEntity<Void> updateUserRole(@Valid @RequestBody UserUpdateRoleRequestDTO data) {
+        userManagerService.updateUserRole(data);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<Void> deleteUser(@RequestBody @Valid DeleteUserRequest data) {
+    public ResponseEntity<Void> deleteUser(@Valid @RequestBody DeleteUserRequest data) {
         userManagerService.deleteUser(data);
         return ResponseEntity.noContent().build();
     }
