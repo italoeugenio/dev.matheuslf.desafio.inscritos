@@ -15,8 +15,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.time.LocalDateTime;
@@ -43,7 +46,7 @@ public class UserAuthenticationService {
         return String.valueOf(100000 + new Random().nextInt(900000));
     }
 
-    public ResponseEntity login(@Valid @RequestBody AuthenticationRequestDTO data) {
+    public ResponseEntity login(AuthenticationRequestDTO data) {
         var usernamePassword = new UsernamePasswordAuthenticationToken(data.email().toLowerCase(), data.password());
         var auth = authenticationManager.authenticate(usernamePassword);
         var token = tokenService.generateToken((UserModel) auth.getPrincipal());
@@ -115,6 +118,7 @@ public class UserAuthenticationService {
         return ResponseEntity.ok("Email verified successfully");
     }
 
+    @Transactional
     public ResponseEntity<String> resendCode(ResendCodeRequestDTO data) {
         UserModel user = userRepository.findUserModelByEmail(data.email().toLowerCase());
         if (user == null) throw new AuthenticationException("User not found");
@@ -155,5 +159,105 @@ public class UserAuthenticationService {
         emailSenderService.sendEmailVerificationCode(emailDTO);
 
         return ResponseEntity.ok("New verification code sent successfully.");
+    }
+
+    @Transactional
+    public ResponseEntity<Void> deleteUser(@AuthenticationPrincipal UserDetails user) {
+        var userModel = userRepository.findUserModelByEmail(user.getUsername());
+        if (userModel == null) {
+            throw new AuthenticationException("User not found");
+        }
+        EmailMessageDTO email = new EmailMessageDTO(
+                user.getUsername(),
+                "Delete your account",
+                "This email confirm that yout deleted yout account"
+        );
+        emailSenderService.sendEmailVerificationCode(email);
+        userRepository.delete(userModel);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Transactional
+    public ResponseEntity<String> recoverPassword(RecoverPasswordRequestDTO data){
+        UserModel user = userRepository.findUserModelByEmail(data.email().toLowerCase());
+        if(user == null) throw new AuthenticationException("User not found");
+        if(!user.isVerified()) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User email not verified. Please verify your email first.");
+
+
+        LocalDateTime now = LocalDateTime.now();
+        int timeToNewCode = 5;
+
+        Optional<ValidationCodesModel> lastCode = user.getValidationCodes().stream()
+                .filter(code -> code.getCodeType() == CodeType.PASSWORD_RESET)
+                .filter(code -> code.getConfirmedAt() == null)
+                .max(Comparator.comparing(code -> code.getCreateAt()));
+        if (lastCode.isPresent()) {
+            LocalDateTime createdApprox = lastCode.get().getCreateAt();
+            if (now.isBefore(createdApprox.plusMinutes(timeToNewCode))) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body("You can request a new password reset code only after " + timeToNewCode + " minutes from the last one");
+            }
+        }
+
+        String resetCode = generateRandomCode();
+        ValidationCodesModel newCode = new ValidationCodesModel();
+        newCode.setCode(resetCode);
+        newCode.setCodeType(CodeType.PASSWORD_RESET);
+        newCode.setExpiresAt(now.plusMinutes(15));
+        newCode.setUser(user);
+
+        user.getValidationCodes().add(newCode);
+        user.setUpdateAt(now);
+        userRepository.save(user);
+
+        EmailMessageDTO emailMessage = new EmailMessageDTO(
+                user.getEmail(),
+                "Password Reset Code",
+                "Your password reset code is: " + resetCode +
+                        "\nThis code expires in 15 minutes." +
+                        "\nIf you didn't request this, please ignore this email."
+        );
+        emailSenderService.sendEmailVerificationCode(emailMessage);
+
+        return ResponseEntity.ok("Password reset code sent to your email");
+    }
+
+    @Transactional
+    public ResponseEntity<String> resetPassword(ResetPasswordRequestDTO data) {
+        UserModel user = userRepository.findUserModelByEmail(data.email().toLowerCase());
+
+        if (user == null) {
+            throw new AuthenticationException("User not found");
+        }
+
+        Optional<ValidationCodesModel> validCodeOpt = user.getValidationCodes().stream()
+                .filter(code -> code.getCode().equals(data.code()))
+                .filter(code -> code.getCodeType() == CodeType.PASSWORD_RESET)
+                .filter(code -> code.getConfirmedAt() == null)
+                .filter(code -> code.getExpiresAt().isAfter(LocalDateTime.now()))
+                .findFirst();
+
+        if (validCodeOpt.isEmpty()) {
+            throw new AuthenticationException("Invalid or expired password reset code");
+        }
+
+        ValidationCodesModel validCode = validCodeOpt.get();
+        validCode.setConfirmedAt(LocalDateTime.now());
+
+        String encryptedPassword = new BCryptPasswordEncoder().encode(data.newPassword());
+        user.setPassword(encryptedPassword);
+        user.setUpdateAt(LocalDateTime.now());
+
+        userRepository.save(user);
+
+        EmailMessageDTO confirmEmail = new EmailMessageDTO(
+                user.getEmail(),
+                "Password Changed Successfully",
+                "Your password has been changed successfully. " +
+                        "If you didn't make this change, please contact support immediately."
+        );
+        emailSenderService.sendEmailVerificationCode(confirmEmail);
+
+        return ResponseEntity.ok("Password reset successfully");
     }
 }

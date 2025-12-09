@@ -32,12 +32,18 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/confirm").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/resend-code").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/auth/recover-password").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/auth/reset-password").permitAll()
+                        .requestMatchers(HttpMethod.DELETE, "/auth/delete-my-account").permitAll()
 
                         //Admin Login
                         .requestMatchers(HttpMethod.POST, "/internal/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/internal/register").permitAll()
                         .requestMatchers(HttpMethod.POST, "/internal/confirm").permitAll()
                         .requestMatchers(HttpMethod.POST, "/internal/resend-code").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/internal/recover-password").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/internal/reset-password").permitAll()
+                        .requestMatchers(HttpMethod.DELETE, "/internal/delete-my-account").permitAll()
 
                         //SWAGGER
                         .requestMatchers(HttpMethod.GET, "/").permitAll()

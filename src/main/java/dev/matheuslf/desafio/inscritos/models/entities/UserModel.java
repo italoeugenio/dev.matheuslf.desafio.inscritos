@@ -52,7 +52,7 @@ public class UserModel implements UserDetails {
     @Column(name = "update_at")
     private LocalDateTime updateAt = LocalDateTime.now();
 
-    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL, fetch = FetchType.LAZY,  orphanRemoval = true)
     private List<ValidationCodesModel> validationCodes = new ArrayList<>();
 
 

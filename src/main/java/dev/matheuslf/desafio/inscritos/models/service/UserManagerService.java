@@ -1,5 +1,7 @@
 package dev.matheuslf.desafio.inscritos.models.service;
 
+import dev.matheuslf.desafio.inscritos.enums.UserRole;
+import dev.matheuslf.desafio.inscritos.exceptions.User.UserException;
 import dev.matheuslf.desafio.inscritos.exceptions.User.UserNotFound;
 import dev.matheuslf.desafio.inscritos.models.dtos.DeleteUserRequest;
 import dev.matheuslf.desafio.inscritos.models.dtos.EmailMessageDTO;
@@ -7,6 +9,7 @@ import dev.matheuslf.desafio.inscritos.models.dtos.UserResponseDTO;
 import dev.matheuslf.desafio.inscritos.models.dtos.UserUpdateRoleRequestDTO;
 import dev.matheuslf.desafio.inscritos.models.entities.UserModel;
 import dev.matheuslf.desafio.inscritos.models.repository.UserRepository;
+import org.apache.coyote.BadRequestException;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -43,9 +46,10 @@ public class UserManagerService {
         return;
     }
 
-    public void deleteUser(DeleteUserRequest data) {
+    public void deleteUser(DeleteUserRequest data){
         var user = userRepository.findUserModelByEmail(data.email());
         if (user == null) throw new UserNotFound("User not found");
+        if (user.getRole().equals(UserRole.ADMIN)) throw new UserException("You can´t delete a user with ADMIN role");
         EmailMessageDTO emailMessageDTO = new EmailMessageDTO(data.email(), "DELETED ACCOUNT", data.deleteMessage());
         emailSenderService.sendEmailVerificationCode(emailMessageDTO);
         userRepository.delete(user);

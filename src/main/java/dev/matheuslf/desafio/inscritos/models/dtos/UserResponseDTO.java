@@ -12,7 +12,8 @@ public record UserResponseDTO(
         String email,
         UserRole role,
         LocalDateTime createAt,
-        LocalDateTime updateAt
+        LocalDateTime updateAt,
+        boolean isVerified
 ) {
     public UserResponseDTO(UserModel user){
         this(
@@ -21,6 +22,8 @@ public record UserResponseDTO(
                 user.getEmail(),
                 user.getRole(),
                 user.getCreateAt(),
-                user.getUpdateAt());
+                user.getUpdateAt(),
+                user.isVerified()
+        );
     }
 }

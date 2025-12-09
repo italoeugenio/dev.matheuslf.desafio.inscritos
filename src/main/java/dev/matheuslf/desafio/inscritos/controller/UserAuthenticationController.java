@@ -1,16 +1,13 @@
 package dev.matheuslf.desafio.inscritos.controller;
 
-import dev.matheuslf.desafio.inscritos.models.dtos.AuthenticationRequestDTO;
-import dev.matheuslf.desafio.inscritos.models.dtos.ConfirmEmailRequestDTO;
-import dev.matheuslf.desafio.inscritos.models.dtos.RegisterUserDTO;
-import dev.matheuslf.desafio.inscritos.models.dtos.ResendCodeRequestDTO;
+import dev.matheuslf.desafio.inscritos.models.dtos.*;
 import dev.matheuslf.desafio.inscritos.models.service.UserAuthenticationService;
 import jakarta.validation.Valid;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import javax.naming.AuthenticationException;
@@ -40,5 +37,20 @@ public class UserAuthenticationController {
     @PostMapping("/resend-code")
     public ResponseEntity<String> resendCode(@Valid @RequestBody ResendCodeRequestDTO data){
         return authenticationService.resendCode(data);
+    }
+
+    @PostMapping("/recover-password")
+    public ResponseEntity<String> recoverPassword(@Valid @RequestBody RecoverPasswordRequestDTO data){
+        return authenticationService.recoverPassword(data);
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<String> resetPassword(@Valid @RequestBody ResetPasswordRequestDTO data){
+        return authenticationService.resetPassword(data);
+    }
+
+    @DeleteMapping("/delete-my-account")
+    public ResponseEntity<Void> deleteUser(@AuthenticationPrincipal UserDetails user){
+        return authenticationService.deleteUser(user);
     }
 }
