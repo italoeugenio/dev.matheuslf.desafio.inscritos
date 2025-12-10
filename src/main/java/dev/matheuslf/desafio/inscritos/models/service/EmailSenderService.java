@@ -14,6 +14,13 @@ public class EmailSenderService {
 
     public void sendEmailVerificationCode(EmailMessageDTO registerDTO){
         SimpleMailMessage message = new SimpleMailMessage();
+        System.out.println("================= EMAIL MOCK =================");
+        System.out.println("TO: " + registerDTO.to());
+        System.out.println("SUBJECT: " + registerDTO.subject());
+        System.out.println("BODY:");
+        System.out.println(registerDTO.body());
+        System.out.println("========================================================");
+
         message.setFrom("noreply@gmail.com");
         message.setTo(registerDTO.to());
         message.setText(registerDTO.body());

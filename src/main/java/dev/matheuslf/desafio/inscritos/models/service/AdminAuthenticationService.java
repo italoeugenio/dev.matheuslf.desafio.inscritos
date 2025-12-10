@@ -163,19 +163,24 @@ public class AdminAuthenticationService {
     }
 
     @Transactional
-    public ResponseEntity<Void> deleteUser(@AuthenticationPrincipal UserDetails user) {
-        var userModel = userRepository.findUserModelByEmail(user.getUsername());
-        if (userRepository.existAnyAdminUser() == null) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "You can't delete your account because there are no other users with role ADMIN"
-            );
-        }
+    public ResponseEntity<Void> deleteUser(@AuthenticationPrincipal UserDetails userDetails) {
+        var userModel = userRepository.findUserModelByEmail(userDetails.getUsername());
+
         if (userModel == null) {
             throw new AuthenticationException("User not found");
         }
+
+        long otherAdminCount = userRepository.countOtherAdmins(userModel.getId());
+
+        if (otherAdminCount == 0) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "You can't delete your account because there are no other verified users with role ADMIN."
+            );
+        }
+
         EmailMessageDTO email = new EmailMessageDTO(
-                user.getUsername(),
+                userModel.getEmail(),
                 "Account Deletion Confirmation",
                 "This email confirms that your account has been successfully deleted."
         );

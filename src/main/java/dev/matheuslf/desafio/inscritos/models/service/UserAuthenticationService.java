@@ -53,7 +53,7 @@ public class UserAuthenticationService {
         return ResponseEntity.ok(new LoginResponseDTO(token));
     }
 
-    public ResponseEntity<String> register(RegisterUserDTO data) throws BadRequestException {
+    public ResponseEntity<String> register(RegisterUserDTO data) {
         if (userRepository.findByEmail(data.email().toLowerCase()) != null) {
             throw new AuthenticationException("Could not complete registration. If you already have an account, please sign in");
         }
