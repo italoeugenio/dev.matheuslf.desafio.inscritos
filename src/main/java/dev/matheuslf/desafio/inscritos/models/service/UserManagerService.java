@@ -9,7 +9,7 @@ import dev.matheuslf.desafio.inscritos.models.dtos.UserResponseDTO;
 import dev.matheuslf.desafio.inscritos.models.dtos.UserUpdateRoleRequestDTO;
 import dev.matheuslf.desafio.inscritos.models.entities.UserModel;
 import dev.matheuslf.desafio.inscritos.models.repository.UserRepository;
-import org.apache.coyote.BadRequestException;
+import dev.matheuslf.desafio.inscritos.models.service.email.EmailSenderService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
