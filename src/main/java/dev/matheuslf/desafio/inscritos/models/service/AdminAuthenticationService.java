@@ -3,6 +3,7 @@ package dev.matheuslf.desafio.inscritos.models.service;
 import dev.matheuslf.desafio.inscritos.enums.CodeType;
 import dev.matheuslf.desafio.inscritos.enums.UserRole;
 import dev.matheuslf.desafio.inscritos.exceptions.Authentication.AuthenticationException;
+import dev.matheuslf.desafio.inscritos.exceptions.User.UserAdminDelete;
 import dev.matheuslf.desafio.inscritos.infra.security.TokenService;
 import dev.matheuslf.desafio.inscritos.models.dtos.*;
 import dev.matheuslf.desafio.inscritos.models.entities.UserModel;
@@ -166,18 +167,11 @@ public class AdminAuthenticationService {
     public ResponseEntity<Void> deleteUser(@AuthenticationPrincipal UserDetails userDetails) {
         var userModel = userRepository.findUserModelByEmail(userDetails.getUsername());
 
-        if (userModel == null) {
-            throw new AuthenticationException("User not found");
-        }
+        if (userModel == null) throw new AuthenticationException("User not found");
 
         long otherAdminCount = userRepository.countOtherAdmins(userModel.getId());
 
-        if (otherAdminCount == 0) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "You can't delete your account because there are no other verified users with role ADMIN."
-            );
-        }
+        if (otherAdminCount == 0) throw new UserAdminDelete("You can't delete your account because there are no other verified users with role ADMIN.");
 
         EmailMessageDTO email = new EmailMessageDTO(
                 userModel.getEmail(),

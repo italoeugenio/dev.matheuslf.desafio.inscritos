@@ -1,5 +1,6 @@
 package dev.matheuslf.desafio.inscritos.handler;
 
+import dev.matheuslf.desafio.inscritos.exceptions.User.UserAdminDelete;
 import dev.matheuslf.desafio.inscritos.exceptions.User.UserException;
 import dev.matheuslf.desafio.inscritos.exceptions.User.UserExceptionDetails;
 import dev.matheuslf.desafio.inscritos.exceptions.User.UserNotFound;
@@ -17,7 +18,7 @@ import java.time.LocalDateTime;
 @ControllerAdvice
 public class UserHandler {
     @ExceptionHandler(UserException.class)
-    public ResponseEntity<UserExceptionDetails> handlerProjectException(UserException exception) {
+    public ResponseEntity<UserExceptionDetails> handlerUserException(UserException exception) {
         return new ResponseEntity<>(
                 UserExceptionDetails.builder()
                         .timestamp(LocalDateTime.now())
@@ -30,7 +31,7 @@ public class UserHandler {
     }
 
     @ExceptionHandler(UserNotFound.class)
-    public ResponseEntity<UserExceptionDetails> handlerProjectNotFoundException(UserNotFound exception) {
+    public ResponseEntity<UserExceptionDetails> handlerUserFoundException(UserNotFound exception) {
         return new ResponseEntity<>(
                 UserExceptionDetails.builder()
                         .timestamp(LocalDateTime.now())
@@ -39,6 +40,19 @@ public class UserHandler {
                         .details(exception.getMessage())
                         .developerMenssage(exception.getClass().getName())
                         .build(), HttpStatus.NOT_FOUND
+        );
+    }
+
+    @ExceptionHandler(UserAdminDelete.class)
+    public ResponseEntity<UserExceptionDetails> handlerUserAdminDelete(UserException exception){
+        return new ResponseEntity<>(
+                UserExceptionDetails.builder()
+                        .timestamp(LocalDateTime.now())
+                        .status(HttpStatus.NOT_FOUND.value())
+                        .title("ERROR TO DELETE AN ADMIN USER")
+                        .details(exception.getMessage())
+                        .developerMenssage(exception.getClass().getName())
+                        .build(), HttpStatus.BAD_REQUEST
         );
     }
 }
