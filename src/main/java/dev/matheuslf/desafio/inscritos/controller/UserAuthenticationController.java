@@ -2,6 +2,7 @@ package dev.matheuslf.desafio.inscritos.controller;
 
 import dev.matheuslf.desafio.inscritos.models.dtos.*;
 import dev.matheuslf.desafio.inscritos.models.service.UserAuthenticationService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,8 @@ import javax.naming.AuthenticationException;
 
 @RestController
 @RequestMapping("auth")
+@Tag(name = "User Login", description = "Endpoints for user login and authentication")
+
 public class UserAuthenticationController {
 
     @Autowired

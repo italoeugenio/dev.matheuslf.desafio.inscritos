@@ -6,6 +6,7 @@ import dev.matheuslf.desafio.inscritos.models.dtos.UserUpdateRoleRequestDTO;
 import dev.matheuslf.desafio.inscritos.models.entities.UserModel;
 import dev.matheuslf.desafio.inscritos.models.repository.UserRepository;
 import dev.matheuslf.desafio.inscritos.models.service.UserManagerService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -17,6 +18,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("manager-users")
+@Tag(name = "User Management", description = "Endpoints for admin manager users")
 public class UserManagerController {
 
     @Autowired
