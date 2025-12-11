@@ -25,7 +25,7 @@ public class TaskModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "taks_id")
+    @Column(name = "task_id")
     private UUID id;
 
     @Column(name = "title")
