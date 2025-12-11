@@ -6,7 +6,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.stereotype.Service;
 
 @Service
-@ConditionalOnMissingBean(SmtpEmailSender.class)
+@ConditionalOnMissingBean(ResendEmailSender.class)
 public class ConsoleEmailSenderService implements EmailSenderService {
     @Override
     public void sendEmailVerificationCode(EmailMessageDTO message) {

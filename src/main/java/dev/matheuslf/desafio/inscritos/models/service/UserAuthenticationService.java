@@ -9,7 +9,6 @@ import dev.matheuslf.desafio.inscritos.models.entities.UserModel;
 import dev.matheuslf.desafio.inscritos.models.entities.ValidationCodesModel;
 import dev.matheuslf.desafio.inscritos.models.repository.UserRepository;
 import dev.matheuslf.desafio.inscritos.models.service.email.EmailSenderService;
-import dev.matheuslf.desafio.inscritos.models.service.email.implementation.SmtpEmailSender;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
