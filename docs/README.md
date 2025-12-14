@@ -1,17 +1,18 @@
-## **How to Run the Project**
+# How to Run the Project
 
-### **Requirements**
+## Requirements
 - Java 17
 - Maven
 - PostgreSQL
 
 ---
 
-## **Option 1: Run Locally**
+## Option 1: Run Locally
 
-### **Environment Variables Setup**
+### Environment Variables Setup
 
 Create a `.env` file in the **root folder** of the project with the following variables:
+
 ```env
 PORT=8080
 DB_HOST=localhost
@@ -19,15 +20,23 @@ DB_USER=your_username
 DB_PASSWORD=your_password
 DB_PORT=5432
 DB_NAME=database_name
+
+# === E-MAIL ===
+RESEND_API_KEY=your_resend_api_key
+RESEND_FROM_EMAIL=your_email@example.com
 ```
 
-In the application.properties file, set the profile to dev-local for local execution:
-```
+⚠️ **Warning:** If `RESEND_API_KEY` and `RESEND_FROM_EMAIL` are not configured, the application will print all email-related information to the console for debugging purposes.
+
+In the `application.properties` file, set the profile to dev-local for local execution:
+
+```properties
 spring.profiles.active=dev-local
 ```
 
-**Run the Application**
-```
+### Run the Application
+
+```bash
 # Install dependencies
 mvn clean install
 
@@ -35,9 +44,23 @@ mvn clean install
 mvn spring-boot:run
 ```
 
+### Default Admin Credentials
 
-## **Option 2: Run with Docker**
-In the root folder of the project, make sure the `.env` file is set up for Docker as well, then run:
+The database is initialized with a default admin user. Use these credentials to log in:
+
+```json
+{
+    "email": "admin@application.com",
+    "password": "admin123wW@"
+}
+```
+
+---
+
+## Option 2: Run with Docker
+
+In the root folder of the project, make sure the `.env` file is set up for Docker as well:
+
 ```env
 PORT=8080
 DB_HOST=app-database
@@ -45,8 +68,17 @@ DB_USER=dev
 DB_PASSWORD=dev
 DB_PORT=5432
 DB_NAME=database_name
+
+# === E-MAIL ===
+RESEND_API_KEY=your_resend_api_key
+RESEND_FROM_EMAIL=your_email@example.com
 ```
-```
+
+⚠️ **Warning:** If `RESEND_API_KEY` and `RESEND_FROM_EMAIL` are not configured, the application will print all email-related information to the console for debugging purposes.
+
+Then run:
+
+```bash
 # Start the containers
 docker compose up -d --build
 
@@ -57,11 +89,22 @@ docker logs app-backend -f
 docker compose down
 ```
 
+### Default Admin Credentials
 
-## **Access the Application**
+The database is initialized with a default admin user. Use these credentials to log in:
+
+```json
+{
+    "email": "admin@application.com",
+    "password": "admin123wW@"
+}
+```
+
+---
+
+## Access the Application
 
 - **API URL:** [http://localhost:8080](http://localhost:8080)
+- **Swagger UI:** [http://localhost:8080/swagger](http://localhost:8080/swagger)
 
-- **Swagger UI:** [http://localhost:8080/swagger](http://localhost:8080/swagger)  
-  The Swagger UI provides an interactive interface to explore and test the API endpoints.
-
+The Swagger UI provides an interactive interface to explore and test the API endpoints.
