@@ -12,8 +12,6 @@ import dev.matheuslf.desafio.inscritos.models.repository.UserRepository;
 import dev.matheuslf.desafio.inscritos.models.service.email.EmailSenderService;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -46,14 +44,14 @@ public class AdminAuthenticationService {
         return String.valueOf(100000 + new Random().nextInt(900000));
     }
 
-    public ResponseEntity login(AuthenticationRequestDTO data) {
+    public LoginResponseDTO login(AuthenticationRequestDTO data) {
         var usernamePassword = new UsernamePasswordAuthenticationToken(data.email().toLowerCase(), data.password());
         var auth = authenticationManager.authenticate(usernamePassword);
         var token = tokenService.generateToken((UserModel) auth.getPrincipal());
-        return ResponseEntity.ok(new LoginResponseDTO(token));
+        return new LoginResponseDTO(token);
     }
 
-    public ResponseEntity<String> register(RegisterUserDTO data) throws BadRequestException {
+    public String register(RegisterUserDTO data){
         if (userRepository.findByEmail(data.email().toLowerCase()) != null) {
             throw new AuthenticationException("Could not complete registration. If you already have an account, please sign in");
         }
@@ -84,17 +82,16 @@ public class AdminAuthenticationService {
         emailSenderService.sendEmailVerificationCode(email);
         userRepository.save(newUser);
 
-        return ResponseEntity.status(HttpStatus.OK).body("message: Registration successful. Please check your email for verification code.\n" +
-                "email: " + newUser.getEmail()
-        );
+        return "message: Registration successful. Please check your email for verification code.\n" +
+                "email: " + newUser.getEmail();
     }
 
-    public ResponseEntity<String> confirm(ConfirmEmailRequestDTO data) {
+    public String confirm(ConfirmEmailRequestDTO data) {
         UserModel user = userRepository.findUserModelByEmail(data.email().toLowerCase());
 
         if (user == null) throw new AuthenticationException("User not found");
         if (user.isVerified()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User already verified");
+            throw new AuthenticationException("User already verified");
         }
 
         Optional<ValidationCodesModel> validCodeOpt = user.getValidationCodes().stream()
@@ -115,14 +112,14 @@ public class AdminAuthenticationService {
         user.setUpdateAt(LocalDateTime.now());
 
         userRepository.save(user);
-        return ResponseEntity.ok("Email verified successfully");
+        return "Email verified successfully";
     }
 
     @Transactional
-    public ResponseEntity<String> resendCode(ResendCodeRequestDTO data) {
+    public String resendCode(ResendCodeRequestDTO data) {
         UserModel user = userRepository.findUserModelByEmail(data.email().toLowerCase());
         if (user == null) throw new AuthenticationException("User not found");
-        if (user.isVerified()) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User already verified");
+        if (user.isVerified()) throw new AuthenticationException("User already verified");
 
         LocalDateTime now = LocalDateTime.now();
         int timeToNewCode = 5;
@@ -134,8 +131,7 @@ public class AdminAuthenticationService {
         if (lastCode.isPresent()) {
             LocalDateTime createdApprox = lastCode.get().getExpiresAt().minusMinutes(10);
             if (now.isBefore(createdApprox.plusMinutes(timeToNewCode))) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body("You can request a new code only after " + timeToNewCode + " minutes from the last one");
+                throw new AuthenticationException("You can request a new code only after " + timeToNewCode + " minutes from the last one");
             }
         }
 
@@ -158,11 +154,11 @@ public class AdminAuthenticationService {
         );
         emailSenderService.sendEmailVerificationCode(emailDTO);
 
-        return ResponseEntity.ok("New verification code sent successfully.");
+        return "New verification code sent successfully.";
     }
 
     @Transactional
-    public ResponseEntity<Void> deleteUser(@AuthenticationPrincipal UserDetails userDetails) {
+    public void deleteUser(@AuthenticationPrincipal UserDetails userDetails) {
         var userModel = userRepository.findUserModelByEmail(userDetails.getUsername());
 
         if (userModel == null) throw new AuthenticationException("User not found");
@@ -178,15 +174,13 @@ public class AdminAuthenticationService {
         );
         emailSenderService.sendEmailVerificationCode(email);
         userRepository.delete(userModel);
-        return ResponseEntity.noContent().build();
     }
 
     @Transactional
-    public ResponseEntity<String> recoverPassword(RecoverPasswordRequestDTO data){
+    public String recoverPassword(RecoverPasswordRequestDTO data){
         UserModel user = userRepository.findUserModelByEmail(data.email().toLowerCase());
         if(user == null) throw new AuthenticationException("User not found");
-        if(!user.isVerified()) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User email not verified. Please verify your email first.");
-
+        if(!user.isVerified()) throw new AuthenticationException("User email not verified. Please verify your email first.");
 
         LocalDateTime now = LocalDateTime.now();
         int timeToNewCode = 5;
@@ -198,8 +192,7 @@ public class AdminAuthenticationService {
         if (lastCode.isPresent()) {
             LocalDateTime createdApprox = lastCode.get().getCreateAt();
             if (now.isBefore(createdApprox.plusMinutes(timeToNewCode))) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body("You can request a new password reset code only after " + timeToNewCode + " minutes from the last one");
+                throw new AuthenticationException("You can request a new password reset code only after " + timeToNewCode + " minutes from the last one");
             }
         }
 
@@ -223,11 +216,11 @@ public class AdminAuthenticationService {
         );
         emailSenderService.sendEmailVerificationCode(emailMessage);
 
-        return ResponseEntity.ok("Password reset code sent to your email");
+        return "Password reset code sent to your email";
     }
 
     @Transactional
-    public ResponseEntity<String> resetPassword(ResetPasswordRequestDTO data) {
+    public String resetPassword(ResetPasswordRequestDTO data) {
         UserModel user = userRepository.findUserModelByEmail(data.email().toLowerCase());
 
         if (user == null) {
@@ -262,6 +255,6 @@ public class AdminAuthenticationService {
         );
         emailSenderService.sendEmailVerificationCode(confirmEmail);
 
-        return ResponseEntity.ok("Password reset successfully");
+        return "Password reset successfully";
     }
 }

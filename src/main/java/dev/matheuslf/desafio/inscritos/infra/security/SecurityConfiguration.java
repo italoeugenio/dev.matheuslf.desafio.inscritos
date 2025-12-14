@@ -38,12 +38,12 @@ public class SecurityConfiguration {
 
                         //Admin Login
                         .requestMatchers(HttpMethod.POST, "/internal/login").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/internal/register").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/internal/confirm").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/internal/resend-code").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/internal/recover-password").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/internal/reset-password").permitAll()
-                        .requestMatchers(HttpMethod.DELETE, "/internal/delete-my-account").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/internal/register").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/internal/confirm").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/internal/resend-code").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/internal/recover-password").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/internal/reset-password").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/internal/delete-my-account").hasRole("ADMIN")
 
                         //SWAGGER
                         .requestMatchers(HttpMethod.GET, "/").permitAll()
@@ -56,14 +56,14 @@ public class SecurityConfiguration {
 
                         //TASK
                         .requestMatchers(HttpMethod.POST, "/tasks/addTask").hasAnyRole("ADMIN", "PM", "DEV")
-                        .requestMatchers(HttpMethod.PUT, "/tasks/{id}").hasAnyRole("ADMIN", "PM", "DEV")
+                        .requestMatchers(HttpMethod.GET, "/tasks/{id}").hasAnyRole("ADMIN", "PM", "DEV")
                         .requestMatchers(HttpMethod.PUT, "/tasks/{id}/status").hasAnyRole("ADMIN", "PM", "DEV")
                         .requestMatchers(HttpMethod.DELETE, "/tasks/{id}").hasAnyRole("ADMIN", "PM")
 
                         //Manager Users
-                        .requestMatchers(HttpMethod.GET, "/manager-users/**").permitAll()
-                        .requestMatchers(HttpMethod.PUT, "/manager-users/**").permitAll()
-                        .requestMatchers(HttpMethod.DELETE, "/manager-users/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/manager-users/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/manager-users/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/manager-users/**").hasRole("ADMIN")
 
                         .anyRequest().authenticated()
                 )
