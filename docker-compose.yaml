@@ -1,0 +1,44 @@
+services:
+  app-backend:
+    container_name: app-backend
+    env_file:
+      - .env
+    build:
+      context: .
+      dockerfile: dev.Dockerfile
+    ports:
+      - "${PORT}:${PORT}"
+    environment:
+      - SPRING_PROFILES_ACTIVE=container
+    depends_on:
+      - app-database
+    restart: always
+
+
+  app-database:
+    image: postgres:17-alpine
+    container_name: app-database
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    volumes:
+      - data_postgresql:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin-application
+    restart: always
+    ports:
+      - "4332:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@application.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    depends_on:
+      - app-database
+
+volumes:
+  data_postgresql:
