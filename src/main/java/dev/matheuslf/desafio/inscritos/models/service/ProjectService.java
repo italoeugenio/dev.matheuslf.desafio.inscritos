@@ -12,8 +12,6 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -58,29 +56,28 @@ public class ProjectService {
             return;
         }
 
-        LocalDateTime minDate = project.getTasks().get(0).getDueTime();
-        LocalDateTime maxDate = project.getTasks().get(0).getDueTime();
-        UUID idMinDate = project.getTasks().get(0).getId();
-        UUID idMaxDate = project.getTasks().get(0).getId();
-        for (int i = 0; i < project.getTasks().size(); i++) {
-            if (project.getTasks().get(i).getDueTime().isBefore(minDate)) {
-                minDate = project.getTasks().get(i).getDueTime();
-                idMinDate = project.getTasks().get(i).getId();
+        TaskModel minTaskByDueTime = null;
+        TaskModel maxTaskByDueTime = null;
+
+        for (TaskModel task : project.getTasks()) {
+            if (minTaskByDueTime == null || task.getDueTime().isBefore(minTaskByDueTime.getDueTime())) {
+                minTaskByDueTime = task;
             }
-            if (project.getTasks().get(i).getDueTime().isAfter(maxDate)) {
-                maxDate = project.getTasks().get(i).getDueTime();
-                idMaxDate = project.getTasks().get(i).getId();
+            if (maxTaskByDueTime == null || task.getDueTime().isAfter(maxTaskByDueTime.getDueTime())) {
+                maxTaskByDueTime = task;
             }
         }
-        if (data.startDate().isAfter(minDate) || data.endDate().isBefore(maxDate)) {
+
+        if (data.startDate().isAfter(minTaskByDueTime.getDueTime()) ||
+                data.endDate().isBefore(maxTaskByDueTime.getDueTime())) {
             throw new ProjectException(
                     String.format(
                             "Cannot update project dates. Your tasks span from %s to %s. " +
                                     "Please set start date on or before %s and end date on or after %s" +
                                     " (Earliest task id: %s, Latest task id: %s)",
-                            minDate, maxDate,
-                            minDate, maxDate,
-                            idMinDate, idMaxDate
+                            minTaskByDueTime.getDueTime(), maxTaskByDueTime.getDueTime(),
+                            minTaskByDueTime.getDueTime(), maxTaskByDueTime.getDueTime(),
+                            minTaskByDueTime.getId(), maxTaskByDueTime.getId()
                     ));
         }
         BeanUtils.copyProperties(data, project);

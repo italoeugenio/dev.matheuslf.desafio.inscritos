@@ -7,7 +7,7 @@ import dev.matheuslf.desafio.inscritos.exceptions.task.TaskException;
 import dev.matheuslf.desafio.inscritos.exceptions.task.TaskNotFoundException;
 import dev.matheuslf.desafio.inscritos.models.dtos.TaskRequestDTO;
 import dev.matheuslf.desafio.inscritos.models.dtos.TaskResponseDetailsDTO;
-import dev.matheuslf.desafio.inscritos.models.dtos.TaskStatusUpdateDTO;
+import dev.matheuslf.desafio.inscritos.models.dtos.TaskStatusUpdateRequestDTO;
 import dev.matheuslf.desafio.inscritos.models.dtos.TaskUpdateResquestDTO;
 import dev.matheuslf.desafio.inscritos.models.entities.ProjectModel;
 import dev.matheuslf.desafio.inscritos.models.entities.TaskModel;
@@ -83,7 +83,7 @@ public class TaskService {
     }
 
     @Transactional
-    public void updateTaskStatus(UUID id, TaskStatusUpdateDTO data) {
+    public void updateTaskStatus(UUID id, TaskStatusUpdateRequestDTO data) {
         TaskModel task = taskRepository.findById(id).orElseThrow(() -> new TaskNotFoundException("Task not found"));
         BeanUtils.copyProperties(data, task);
         taskRepository.save(task);

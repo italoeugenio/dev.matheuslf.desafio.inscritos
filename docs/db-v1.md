@@ -43,6 +43,6 @@ Contains the tasks associated with each project.
 | `task_id`     | `uuid`           | Unique identifier for the task                                | **Primary Key** |
 | `title`       | `string(5-150)`  | Title of the task                                             | **Not Null**    |
 | `description` | `string`         | Description of the task                                       |                 |
-| `status`      | `enum`           | Indicates the state and progress of the task *(TODO / DOING / DONE)* |                 |
+| `status`      | `<br/>enum`           | Indicates the state and progress of the task *(TODO / DOING / DONE)* |                 |
 | `priority`    | `enum`           | Indicates the importance of the task *(LOW / MEDIUM / HIGH)*  |                 |
 | `due_date`    | `date`           | Task deadline date                                            |                 |

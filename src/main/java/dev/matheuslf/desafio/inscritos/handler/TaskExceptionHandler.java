@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 @ControllerAdvice
 public class TaskExceptionHandler {
     @ExceptionHandler(TaskException.class)
-    public ResponseEntity<TaskExceptionDetails> handlerProjectException(TaskException exception) {
+    public ResponseEntity<TaskExceptionDetails> handlerTaskException(TaskException exception) {
         return new ResponseEntity<>(
                 TaskExceptionDetails.builder()
                         .timestamp(LocalDateTime.now())
@@ -29,7 +29,7 @@ public class TaskExceptionHandler {
     }
 
     @ExceptionHandler(TaskNotFoundException.class)
-    public ResponseEntity<TaskExceptionDetails> handlerProjectNotFoundException(TaskException exception) {
+    public ResponseEntity<TaskExceptionDetails> handlerTaskNotFoundException(TaskException exception) {
         return new ResponseEntity<>(
                 TaskExceptionDetails.builder()
                         .timestamp(LocalDateTime.now())

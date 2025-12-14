@@ -42,14 +42,15 @@ public class ProjectController {
 
     @ProjectApiDoc.GetAllProjects
     @GetMapping("")
-    public Page<ProjectResponseDTO> getAll( Pageable pageable) {
+    public Page<ProjectResponseDTO> getAll(Pageable pageable) {
         return projectService.getAll(pageable);
     }
 
     @ProjectApiDoc.GetProjectById
     @GetMapping("/{id}")
-    public ProjectResponseDetailsDTO getByid(@PathVariable("id") UUID id) {
-        return projectService.getById(id);
+    public ResponseEntity<ProjectResponseDetailsDTO> getByid(@PathVariable("id") UUID id) {
+        var project = projectService.getById(id);
+        return ResponseEntity.ok().body(project);
     }
 
 
@@ -62,7 +63,7 @@ public class ProjectController {
 
     @ProjectApiDoc.UpdateProject
     @PutMapping("/{id}")
-    public ResponseEntity<Void> updateProject(@PathVariable("id") UUID id, @RequestBody ProjectRequestDTO data) {
+    public ResponseEntity<Void> updateProject(@PathVariable("id") UUID id,@Valid @RequestBody ProjectRequestDTO data) {
         projectService.updateProject(id, data);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
