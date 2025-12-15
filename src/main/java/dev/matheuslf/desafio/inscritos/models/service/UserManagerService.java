@@ -40,7 +40,7 @@ public class UserManagerService {
     @Transactional
     public void updateUserRole(UserUpdateRoleRequestDTO data) {
         var user = userRepository.findUserModelByEmail(data.email());
-        if (user == null) throw new UserNotFound("User not found");
+        if (user == null) throw new UserNotFound("User not fou nd");
         BeanUtils.copyProperties(data, user);
         userRepository.save(user);
         return;
