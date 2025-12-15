@@ -1,6 +1,7 @@
 package dev.matheuslf.desafio.inscritos.models.entities;
 
 import dev.matheuslf.desafio.inscritos.enums.UserRole;
+import dev.matheuslf.desafio.inscritos.models.dtos.RegisterUserDTO;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,6 +10,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -61,6 +63,12 @@ public class UserModel implements UserDetails {
         this.email = email;
         this.password = password;
         this.role = role;
+    }
+
+    public UserModel(RegisterUserDTO data){
+        this.fullName = data.fullName();
+        this.email = data.email();
+        this.password = new BCryptPasswordEncoder().encode(data.password());
     }
 
     @Override
