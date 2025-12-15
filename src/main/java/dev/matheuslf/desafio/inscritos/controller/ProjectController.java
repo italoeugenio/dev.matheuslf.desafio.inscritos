@@ -1,20 +1,11 @@
 package dev.matheuslf.desafio.inscritos.controller;
 
 import dev.matheuslf.desafio.inscritos.config.swagger.docs.project.ProjectApiDoc;
-import dev.matheuslf.desafio.inscritos.exceptions.project.ProjectException;
-import dev.matheuslf.desafio.inscritos.exceptions.project.ProjectExceptionDetails;
-import dev.matheuslf.desafio.inscritos.exceptions.project.ProjectNotFoundException;
 import dev.matheuslf.desafio.inscritos.models.dtos.ProjectRequestDTO;
 import dev.matheuslf.desafio.inscritos.models.dtos.ProjectResponseDTO;
 import dev.matheuslf.desafio.inscritos.models.dtos.ProjectResponseDetailsDTO;
 import dev.matheuslf.desafio.inscritos.models.entities.ProjectModel;
 import dev.matheuslf.desafio.inscritos.models.service.ProjectService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;

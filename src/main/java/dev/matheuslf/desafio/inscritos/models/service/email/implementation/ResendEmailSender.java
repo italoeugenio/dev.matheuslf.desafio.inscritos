@@ -21,15 +21,6 @@ public class ResendEmailSender implements EmailSenderService {
     @Value("${api.security.resend.email}")
     private String email;
 
-    @PostConstruct
-    public void testarVariaveis() {
-        System.out.println("=== TESTE RESEND CONFIG ===");
-        System.out.println("Token carregado: " + (secret != null ? secret.substring(0, 3) + "..." : "NULL"));
-        System.out.println("Email carregado: " + email);
-        System.out.println("===========================");
-    }
-
-
     @Override
     public void sendEmailVerificationCode(EmailMessageDTO message) {
         Resend resend = new Resend(secret);
