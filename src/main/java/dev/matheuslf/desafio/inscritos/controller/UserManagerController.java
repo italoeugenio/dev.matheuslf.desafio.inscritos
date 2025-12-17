@@ -51,10 +51,4 @@ public class UserManagerController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/test")
-    public long test(){
-        UUID id = UUID.fromString("8a8af4d2-9886-4aca-8d76-b8eac06418b5");
-        return userRepository.countOtherAdmins(id);
-    }
-
 }
