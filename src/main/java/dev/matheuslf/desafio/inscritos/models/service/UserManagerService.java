@@ -3,7 +3,7 @@ package dev.matheuslf.desafio.inscritos.models.service;
 import dev.matheuslf.desafio.inscritos.enums.UserRole;
 import dev.matheuslf.desafio.inscritos.exceptions.User.UserException;
 import dev.matheuslf.desafio.inscritos.exceptions.User.UserNotFound;
-import dev.matheuslf.desafio.inscritos.models.dtos.DeleteUserRequest;
+import dev.matheuslf.desafio.inscritos.models.dtos.DeleteUserRequestDTO;
 import dev.matheuslf.desafio.inscritos.models.dtos.EmailMessageDTO;
 import dev.matheuslf.desafio.inscritos.models.dtos.UserResponseDTO;
 import dev.matheuslf.desafio.inscritos.models.dtos.UserUpdateRoleRequestDTO;
@@ -46,7 +46,7 @@ public class UserManagerService {
         return;
     }
 
-    public void deleteUser(DeleteUserRequest data){
+    public void deleteUser(DeleteUserRequestDTO data){
         var user = userRepository.findUserModelByEmail(data.email());
         if (user == null) throw new UserNotFound("User not found");
         if (user.getRole().equals(UserRole.ADMIN)) throw new UserException("You can´t delete a user with ADMIN role");
