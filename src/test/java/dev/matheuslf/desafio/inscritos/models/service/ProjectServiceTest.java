@@ -10,7 +10,6 @@ import dev.matheuslf.desafio.inscritos.models.dtos.TaskRequestDTO;
 import dev.matheuslf.desafio.inscritos.models.entities.ProjectModel;
 import dev.matheuslf.desafio.inscritos.models.entities.TaskModel;
 import dev.matheuslf.desafio.inscritos.models.repository.ProjectRepository;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -63,7 +62,7 @@ class ProjectServiceTest {
         assertThat(result).isNotNull();
         assertThat(result.getName()).isEqualTo(validProjectRequest.name());
         assertThat(result.getDescription()).isEqualTo(validProjectRequest.description());
-Ø
+
         verify(projectRepository, times(1)).save(any(ProjectModel.class));
     }
 
