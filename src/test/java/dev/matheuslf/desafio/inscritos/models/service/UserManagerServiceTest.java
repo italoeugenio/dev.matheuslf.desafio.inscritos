@@ -60,7 +60,7 @@ class UserManagerServiceTest {
 
         UserResponseDTO result = userManagerService.getByEmail(user.getEmail());
 
-        assertThat(result). isNotNull();
+        assertThat(result).isNotNull();
         assertThat(result.email()).isEqualTo(user.getEmail());
         assertThat(result.fullName()).isEqualTo(user.getFullName());
 

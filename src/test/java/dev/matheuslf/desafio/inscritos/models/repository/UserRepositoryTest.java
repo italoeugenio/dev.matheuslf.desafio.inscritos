@@ -32,7 +32,7 @@ class UserRepositoryTest {
     }
 
     @Test
-    @DisplayName("Should return the correct count of other admins - 1 that are the logged user")
+    @DisplayName("Should return the correct count of other admins - 2 that are the register user")
     void countOtherAdminsCase2() {
         UserModel me = this.createAdminUser(new RegisterUserDTO("Me", "me@gmail.com", "Pass123!"));
         this.createAdminUser(new RegisterUserDTO("Other 1", "other1@gmail.com", "Pass123!"));
