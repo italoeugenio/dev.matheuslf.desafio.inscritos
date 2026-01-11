@@ -7,7 +7,7 @@ import org.springframework.data.jpa.domain.Specification;
 
 import java.util.UUID;
 
-public class TaskSpecification {
+public class  TaskSpecification {
 
     public static Specification<TaskModel> hasStatus(TaskStatus status) {
         return (root, query, criteriaBuilder) ->
