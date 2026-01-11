@@ -1,9 +1,8 @@
 package dev.matheuslf.desafio.inscritos.controller;
 
-import dev.matheuslf.desafio.inscritos.models.dtos.DeleteUserRequest;
+import dev.matheuslf.desafio.inscritos.models.dtos.DeleteUserRequestDTO;
 import dev.matheuslf.desafio.inscritos.models.dtos.UserResponseDTO;
 import dev.matheuslf.desafio.inscritos.models.dtos.UserUpdateRoleRequestDTO;
-import dev.matheuslf.desafio.inscritos.models.entities.UserModel;
 import dev.matheuslf.desafio.inscritos.models.repository.UserRepository;
 import dev.matheuslf.desafio.inscritos.models.service.UserManagerService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -46,7 +45,7 @@ public class UserManagerController {
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<Void> deleteUser(@Valid @RequestBody DeleteUserRequest data){
+    public ResponseEntity<Void> deleteUser(@Valid @RequestBody DeleteUserRequestDTO data){
         userManagerService.deleteUser(data);
         return ResponseEntity.noContent().build();
     }

@@ -10,7 +10,6 @@ import dev.matheuslf.desafio.inscritos.models.entities.UserModel;
 import dev.matheuslf.desafio.inscritos.models.entities.ValidationCodesModel;
 import dev.matheuslf.desafio.inscritos.models.repository.UserRepository;
 import dev.matheuslf.desafio.inscritos.models.service.email.EmailSenderService;
-import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -45,8 +44,8 @@ public class AdminAuthenticationService {
     }
 
     public LoginResponseDTO login(AuthenticationRequestDTO data) {
-        var usernamePassword = new UsernamePasswordAuthenticationToken(data.email().toLowerCase(), data.password());
-        var auth = authenticationManager.authenticate(usernamePassword);
+        var user = new UsernamePasswordAuthenticationToken(data.email().toLowerCase(), data.password());
+        var auth = authenticationManager.authenticate(user);
         var token = tokenService.generateToken((UserModel) auth.getPrincipal());
         return new LoginResponseDTO(token);
     }

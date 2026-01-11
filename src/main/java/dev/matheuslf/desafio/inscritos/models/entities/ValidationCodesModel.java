@@ -2,10 +2,7 @@ package dev.matheuslf.desafio.inscritos.models.entities;
 
 import dev.matheuslf.desafio.inscritos.enums.CodeType;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -16,6 +13,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(of = "id")
+@ToString(exclude = "user")
 public class ValidationCodesModel {
     private static final long serialVersion = 1L;
 
